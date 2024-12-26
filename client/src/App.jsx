@@ -47,7 +47,7 @@ function App() {
             <div className="wrapper mt-4">
               <div className="row bg-secondary align-items-center">
                 <span className='text-small' style={styles.text}>BITCLUB Missions</span>
-                <div style={{boxShadow: "1px 1px 1px 2px #6C7293"}} className="col bg-dark m-1 rounded p-3">
+                <div style={{boxShadow: "1px 0px 0px 0px #6C7293"}} className="col bg-dark m-1 rounded p-3">
                   <p>
                     <img src="/logo/48.png" width={20} height={20} alt="" />
                     <span style={{ fontSize: "14px", margin: "3px" }}>Bitclub</span>
@@ -55,7 +55,7 @@ function App() {
 
                   <button style={{ width: "100%", boxShadow: "1px 1px 1px 2px #6C7293" }} className='btn btn-small bg-secondary'>Go</button>
                 </div>
-                <div style={{boxShadow: "1px 1px 1px 2px #6C7293"}} className="col bg-dark m-1 rounded p-3">
+                <div style={{boxShadow: "1px 0px 0px 0px #6C7293"}} className="col bg-dark m-1 rounded p-3">
                   <p>
                     <img src="https://freepnglogo.com/images/all_img/1725374683twitter-x-logo.png" width={20} height={20} alt="" />
                     <span style={{ fontSize: "14px", margin: "3px" }}>Twitter</span>
@@ -63,7 +63,7 @@ function App() {
 
                   <button style={{ width: "100%", boxShadow: "1px 1px 1px 2px #6C7293" }} className='btn btn-small bg-secondary'>Go</button>
                 </div>
-                <div style={{boxShadow: "1px 1px 1px 2px #6C7293"}} className="col bg-dark m-1 rounded p-3">
+                <div style={{boxShadow: "1px 0px 0px 0px #6C7293"}} className="col bg-dark m-1 rounded p-3">
                   <p>
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4jV31DQxq31fTTIxaUrNp3XdqYvWzfyux-E6pzrZ9fb4UYFiVfFdJ&usqp=CAE&s" width={25} height={25} alt="" />
                     <span style={{ fontSize: "13px", margin: "3px" }}>Telegram</span>
@@ -104,9 +104,7 @@ function App() {
           </div>
         </div>
 
-        <a href="#" className="btn btn-lg btn-primary mb-5 btn-lg-square back-to-top"><i className="bi bi-arrow-up"></i></a>
-      </div >
-      <div style={styles.menuBar}>
+        <div style={styles.menuBar}>
         <div style={styles.iconContainer}>
           <i className="fas fa-home" style={styles.icon}></i>
           <span style={styles.label}>Home</span>
@@ -128,6 +126,8 @@ function App() {
           <span style={styles.label}>Airdrop</span>
         </div>
       </div>
+
+      </div >
     </>
   )
 }
