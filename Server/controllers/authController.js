@@ -19,9 +19,8 @@ const getTaskDone = async (req, res) => {
   const { userID } = req.body;
   const results = await TaskDone.find({ UserID: userID });
 
-  console.log(results)
   if (results.length > 0) {
-    console.log(results)
+
     const data = [];
     for (let i = 0; i < results.length; i++) {
       const element = results[i];
@@ -29,7 +28,6 @@ const getTaskDone = async (req, res) => {
       data.push(element);
     }
     
-    console.log("Hello001", data)
     return res.json({ data });
   } else {
     res.json({ data: false });
