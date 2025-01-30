@@ -4,7 +4,7 @@ const cors = require("cors");
 const router = express.Router();
 
 const corsOptions = {
-  origin: "http://localhost:2000",
+  origin: "https://bitclub-airdrop.vercel.app",
   credentials: true,
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization",
