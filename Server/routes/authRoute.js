@@ -9,7 +9,7 @@ const corsOptions = {
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization",
 };
-//http://localhost:2000
+// http://localhost:2000
 router.use(cors(corsOptions));
 router.options("*", cors(corsOptions));
 
@@ -29,8 +29,8 @@ router.post("/task", getTaskDone);
 router.post("/activeTask", activeTask);
 router.post("/createTask", createTaskDone);
 router.post("/claimed", claimedFunction);
-router.post("/api/farming/start", startFarm);
-router.post("/api/farming/claim", claimFarming);
-router.get("/api/farming/status/:userId", farmingStatus);
+router.post("/start", startFarm);
+router.post("/claim", claimFarming);
+router.get("/status/:userId", farmingStatus);
 
 module.exports = router;

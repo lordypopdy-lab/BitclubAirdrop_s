@@ -15,16 +15,21 @@ cron.schedule("0 * * * *", async () => {
 });
 
 const getTaskDone = async (req, res) => {
+
   const { userID } = req.body;
   const results = await TaskDone.find({ UserID: userID });
 
+  console.log(results)
   if (results.length > 0) {
+    console.log(results)
     const data = [];
     for (let i = 0; i < results.length; i++) {
       const element = results[i];
       // const filterTask = await TaskModel.findOne({ TaskID: element.TaskID });
       data.push(element);
     }
+    
+    console.log("Hello001", data)
     return res.json({ data });
   } else {
     res.json({ data: false });
@@ -32,6 +37,7 @@ const getTaskDone = async (req, res) => {
 };
 
 const activeTask = async (req, res) => {
+
   const { userID } = req.body;
   const results1 = await TaskDone.find({ UserID: userID });
 
@@ -54,6 +60,7 @@ const activeTask = async (req, res) => {
 };
 
 const createTaskDone = async (req, res) => {
+
   const { TaskID, userID } = req.body;
 
   const findTask = await TaskDone.findOne({ TaskID: TaskID });
@@ -228,19 +235,18 @@ const newTask = async (req, res) => {
 
 const startFarm = async (req, res) => {
   const { userId } = req.body;
-  const farmingDuration = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+  const farmingDuration = 3 * 60 * 60 * 1000; 
 
   try {
-    // Update farming data or create a new record if it doesn't exist
+
     const updatedData = await Farming.findOneAndUpdate(
-      { userId }, // Query by userId
+      { userId }, 
       {
         farmingStartTime: Date.now(),
-        tokenBalance: 0,
         claimed: false,
-        farmingDuration, // Include farmingDuration
+        farmingDuration, 
       },
-      { upsert: true, new: true } // Create if not exists, return updated doc
+      { upsert: true, new: true } 
     );
 
     res.json({ farmingDuration });
@@ -254,19 +260,17 @@ const claimFarming = async (req, res) => {
   const { userId, tokens } = req.body;
 
   try {
-    // Find user farming data by userId
+
     const userData = await Farming.findOne({ userId });
 
     if (!userData) {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Check if tokens are already claimed
     if (userData.claimed) {
       return res.status(400).json({ error: "Tokens already claimed." });
     }
 
-    // Check if farming duration is complete
     const currentTime = Date.now();
     const farmingStartTime = new Date(userData.farmingStartTime).getTime();
     const farmingDuration = userData.farmingDuration;
@@ -288,13 +292,15 @@ const claimFarming = async (req, res) => {
         error: "Invalid Token Value",
       });
     }
-    // Update claimed status and token balance
-    await Farming.updateOne(
+
+     await Farming.updateOne(
       { userId: userId },
       { $inc: { tokenBalance: tokens }, claimed: true }
     );
 
-    res.json({ tokenBalance: tokens });
+    const updatedBalance = userData.tokenBalance + tokens;
+
+    res.json({ tokenBalance: tokens, updated: updatedBalance });
   } catch (error) {
     console.error("Error claiming tokens:", error);
     res.status(500).json({ error: "Failed to claim tokens." });
