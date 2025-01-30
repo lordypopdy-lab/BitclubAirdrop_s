@@ -17,5 +17,5 @@ app.use('/', require('./routes/authRoute'));
 
 const PORT = 8080
 app.listen(PORT, ()=>{
-  console.log(`Bitclub New0147 is Running at Port: ${PORT}`);
+  console.log(`Bitclub Airdrop is Running at Port: ${PORT}`);
 })
