@@ -2,6 +2,37 @@ const cron = require("node-cron");
 const TaskDone = require("../models/TaskDone");
 const TaskModel = require("../models/TaskModel");
 const Farming = require("../models/FarmingModel");
+const User = require('../models/User');
+
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findOne({ userId: req.params.userId });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+const user = async (req, res) => {
+  const { userId, referrerId } = req.body;
+
+  try {
+    const user = new User({ userId, referrerId });
+    await user.save();
+
+    if (referrerId) {
+      const referrer = await User.findOne({ userId: referrerId });
+      if (referrer) {
+        referrer.referralRewards += 20; // 20% of mining rewards
+        await referrer.save();
+      }
+    }
+
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
 
 cron.schedule("0 * * * *", async () => {
   try {
@@ -27,7 +58,7 @@ const getTaskDone = async (req, res) => {
       // const filterTask = await TaskModel.findOne({ TaskID: element.TaskID });
       data.push(element);
     }
-    
+
     return res.json({ data });
   } else {
     res.json({ data: false });
@@ -114,7 +145,7 @@ const claimedFunction = async (req, res) => {
       { TaskID: claimID },
       { $set: { ButtonStatus: "Completed" } }
     );
-    
+
     await Farming.updateOne(
       { userId: userID },
       { $inc: { tokenBalance: claimValue } }
@@ -233,18 +264,18 @@ const newTask = async (req, res) => {
 
 const startFarm = async (req, res) => {
   const { userId } = req.body;
-  const farmingDuration = 3 * 60 * 60 * 1000; 
+  const farmingDuration = 3 * 60 * 60 * 1000;
 
   try {
 
     const updatedData = await Farming.findOneAndUpdate(
-      { userId }, 
+      { userId },
       {
         farmingStartTime: Date.now(),
         claimed: false,
-        farmingDuration, 
+        farmingDuration,
       },
-      { upsert: true, new: true } 
+      { upsert: true, new: true }
     );
 
     res.json({ farmingDuration });
@@ -291,7 +322,7 @@ const claimFarming = async (req, res) => {
       });
     }
 
-     await Farming.updateOne(
+    await Farming.updateOne(
       { userId: userId },
       { $inc: { tokenBalance: tokens }, claimed: true }
     );
@@ -343,6 +374,8 @@ const farmingStatus = async (req, res) => {
 };
 
 module.exports = {
+  user,
+  getUser,
   newTask,
   startFarm,
   activeTask,

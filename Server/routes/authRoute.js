@@ -14,6 +14,8 @@ router.use(cors(corsOptions));
 router.options("*", cors(corsOptions));
 
 const {
+  user,
+  getUser,
   newTask,
   startFarm,
   activeTask,
@@ -31,6 +33,8 @@ router.post("/createTask", createTaskDone);
 router.post("/claimed", claimedFunction);
 router.post("/start", startFarm);
 router.post("/claim", claimFarming);
+router.post("/api/user", user);
+router.get("/api/user/:userId", getUser);
 router.get("/status/:userId", farmingStatus);
 
 module.exports = router;
