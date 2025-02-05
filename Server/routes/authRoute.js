@@ -9,7 +9,7 @@ const corsOptions = {
   methods: "GET,POST,PUT,DELETE,OPTIONS",
   allowedHeaders: "Content-Type,Authorization",
 };
-//http://localhost:2000
+//http://localhost:2000 
 router.use(cors(corsOptions));
 router.options("*", cors(corsOptions));
 
