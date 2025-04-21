@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  userName: { type: String, default: "" },
   userId: { type: String, required: true, unique: true },
   referrerId: { type: String, default: null },
   miningRewards: { type: Number, default: 0 },

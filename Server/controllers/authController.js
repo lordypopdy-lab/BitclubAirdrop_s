@@ -1,8 +1,93 @@
 const cron = require("node-cron");
+const crypto = require('crypto');
 const TaskDone = require("../models/TaskDone");
 const TaskModel = require("../models/TaskModel");
 const Farming = require("../models/FarmingModel");
 const User = require('../models/User');
+const referralLinks = require("../models/ReferralLinks");
+const referralListModel = require("../models/RferralLists");
+
+const getRefBal = async (req, res) => {
+  const { userId } = req.body;
+  const checkIF = await referralLinks.findOne({ userId: userId });
+  if (checkIF) {
+    return res.json({
+      RB: checkIF
+    })
+  }
+
+  return res.json(false);
+}
+
+const getReferrals = async (req, res) => {
+  const { userId } = req.body;
+
+  const ifExist = await referralLinks.findOne({ userId: userId });
+  if (ifExist) {
+    const refCode = ifExist.referralCode;
+    const allReferrals = await referralListModel.find({ referralCode: refCode });
+    //  console.log("Referral Code:", refCode);
+    //   console.log("All Referrals:", allReferrals)
+    return res.json({ referrals: allReferrals });
+  }
+
+  return res.json(false)
+}
+
+const newReferral = async (req, res) => {
+  const { referralCode, userId } = req.body;
+
+  if (!referralCode) {
+    return res.status(400).json({ error: 'Referral code is required' });
+  }
+
+  const exists = await referralListModel.findOne({
+    referedBy: userId
+  })
+
+  if (exists) {
+    return res.json(false);
+  }
+
+  if (!exists) {
+    await referralListModel.create({
+      referedBy: userId,
+      referralCode: referralCode,
+      req_date: new Date()
+    })
+
+  }
+
+}
+
+const startReferral = async (req, res) => {
+  const { userId } = req.body;
+
+  const findLink = await referralLinks.findOne({ userId: userId });
+  if (findLink) {
+    return res.status(200).json(
+      findLink
+    )
+  }
+
+  const generateReferralLink = async (userId) => {
+    const baseUrl = "https://bitclub-airdrop.vercel.app";
+    const referralCode = Buffer.from(userId).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+
+    await referralLinks.create({
+      userId: userId,
+      referralLink: `${baseUrl}/referral/${referralCode}`,
+      referralCode: referralCode,
+      req_date: new Date()
+    })
+
+    const referralLink = `${baseUrl}/referral/${referralCode}`;
+    return res.status(200).json(referralLink);
+  }
+
+  generateReferralLink(userId)
+
+}
 
 const getUser = async (req, res) => {
   try {
@@ -123,6 +208,7 @@ const createTaskDone = async (req, res) => {
 const claimedFunction = async (req, res) => {
   const { claimID, userID, claimValue } = req.body;
 
+  console.log("Hello")
   try {
     const findfarmer = await Farming.findOne({ userId: userID });
 
@@ -150,6 +236,36 @@ const claimedFunction = async (req, res) => {
       { userId: userID },
       { $inc: { tokenBalance: claimValue } }
     );
+
+    const ifReferral = await referralListModel.findOne({ referedBy: userID });
+    if (ifReferral) {
+      const ifReferralLink = await referralLinks.findOne({ referralCode: ifReferral.referralCode });
+      function removeThirtyPercent(claimValue) {
+        if (typeof claimValue !== 'number' || isNaN(claimValue)) {
+          throw new Error('Invalid input: Please provide a valid number.');
+        }
+
+        return claimValue - (claimValue * 0.15);
+      }
+
+      const newValue = removeThirtyPercent(claimValue);
+      await referralLinks.updateOne({
+        referralCode: ifReferral.referralCode
+      }, {
+        $set: {
+          profitMade: + newValue
+        }
+      });
+
+      await Farming.updateOne({
+        userId: ifReferralLink.userId
+      }, {
+        $set: {
+          tokenBalance: + newValue
+        }
+      })
+      console.log("Successfully Added referral Balance")
+    }
 
     return res.json({ message: "Success" });
   } catch (error) {
@@ -377,10 +493,14 @@ module.exports = {
   user,
   getUser,
   newTask,
+  getRefBal,
   startFarm,
   activeTask,
+  newReferral,
   getTaskDone,
   claimFarming,
+  startReferral,
+  getReferrals,
   farmingStatus,
   createTaskDone,
   claimedFunction,
